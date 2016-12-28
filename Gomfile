@@ -1,0 +1,7 @@
+gom 'cloud.google.com/go', :commit => '4e436992a513aa1dec28f8adda5c8173724d493e'
+gom 'github.com/golang/protobuf', :commit => '8ee79997227bf9b34611aee7946ae64735e6fd93'
+gom 'github.com/googleapis/gax-go', :commit => 'da06d194a00e19ce00d9011a13931c3f6f6887c7'
+gom 'golang.org/x/net', :commit => '45e771701b814666a7eb299e6c7a57d0b1799e91'
+gom 'golang.org/x/oauth2', :commit => '314dd2c0bf3ebd592ec0d20847d27e79d0dbe8dd'
+gom 'google.golang.org/api', :commit => '55146ba61254fdb1c26d65ff3c04bc1611ad73fb'
+gom 'google.golang.org/grpc', :commit => '9d682f9293b408c42d17c587d0e2a31237ac3f10'
