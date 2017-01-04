@@ -16,17 +16,17 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// Creates a client
-	client, err := storage.NewClient(ctx)
+	// Creates a storageClient
+	storageClient, err := storage.NewClient(ctx)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("Failed to create storageClient: %v", err)
 	}
 
 	// The name for the new bucket
 	bucketName := os.Getenv("BUCKET")
 
 	// Prepares a new bucket
-	bucket := client.Bucket(bucketName)
+	bucket := storageClient.Bucket(bucketName)
 
 	it := bucket.Objects(ctx, nil)
 	for {
