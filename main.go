@@ -8,11 +8,9 @@ import (
 	"time"
 	"os"
 
-	// Imports the Google Cloud Storage client package
 	"cloud.google.com/go/storage"
-
-	// Imports the Google Cloud Datastore client package
 	"cloud.google.com/go/datastore"
+	"cloud.google.com/go/pubsub"
 
 	"google.golang.org/api/iterator"
 )
@@ -30,6 +28,7 @@ func main() {
 
 	projectID := os.Getenv("PROJECT")
 	bucketName := os.Getenv("BUCKET")
+	topicName := os.Getenv("TOPIC")
 
 	// Creates a storageClient
 	storageClient, err := storage.NewClient(ctx)
@@ -40,8 +39,16 @@ func main() {
 	// Creates a datastoreClient
 	datastoreClient, err := datastore.NewClient(ctx, projectID)
 	if err != nil {
-		log.Fatalf("Failed to create datastoreClient: %v", err)
+		log.Fatalf("Failed to create datastoreClient for %s: %v", projectID, err)
 	}
+
+	// Creates a pubsubClient
+	pubsubClient, err := pubsub.NewClient(ctx, projectID)
+	if err != nil {
+		log.Fatalf("Failed to create pubsubClient for %s: %v", projectID, err)
+	}
+
+	topic := pubsubClient.Topic(topicName)
 
 	watchKey := datastore.NameKey("Watches", "1000001", nil)
 	watch := &Watch{}
@@ -92,6 +99,18 @@ func main() {
 			uf := &UploadedFile{Url: url, Updated: o.Updated}
 			if _, err := datastoreClient.Put(ctx, k, uf); err != nil {
 				fmt.Println("Failed to put ", uf)
+			} else {
+				attrs := map[string]string {
+					"download_files": url,
+				}
+				msgIDs, err := topic.Publish(ctx, &pubsub.Message{
+					Attributes: attrs,
+				})
+				if err != nil {
+					log.Fatalln("Failed to publish of insertion of ", url, " cause of ", err)
+				} else {
+					fmt.Println("Message[", msgIDs, "] is published successfully")
+				}
 			}
 		}
 		// fmt.Println(o.Created, o.Updated, o.Bucket, o.Name, o.ContentType, o.Size)
